@@ -489,6 +489,12 @@ label {
     min-width: 0;
 }
 
+.lm-wordmark.wp-block-image,
+.lm-footer-wordmark.wp-block-image,
+.lm-footer-anpc-link.wp-block-image {
+    margin: 0;
+}
+
 .lm-wordmark {
     grid-column: 2;
     display: inline-flex;
@@ -507,6 +513,20 @@ label {
 .lm-logo-image {
     width: clamp(10.5rem, 17vw, 12.5rem);
     height: auto;
+}
+
+.lm-desktop-nav .wp-block-navigation__container,
+.lm-menu-nav .wp-block-navigation__container,
+.lm-footer-links .wp-block-navigation__container {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.lm-desktop-nav .wp-block-navigation-item,
+.lm-menu-nav .wp-block-navigation-item,
+.lm-footer-links .wp-block-navigation-item {
+    list-style: none;
 }
 
 .lm-header-actions {

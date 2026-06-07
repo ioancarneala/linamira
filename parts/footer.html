@@ -2,7 +2,9 @@
   <div class="lm-container">
     <div class="lm-footer-grid">
       <section class="lm-footer-brand" aria-label="Despre Linamira">
-        <!-- wp:linamira/logo {"className":"lm-footer-wordmark","imageClassName":"lm-footer-logo-image","ariaLabel":"Linamira acasă"} /-->
+        <!-- wp:image {"sizeSlug":"full","linkDestination":"custom","className":"lm-footer-wordmark"} -->
+        <figure class="wp-block-image size-full lm-footer-wordmark"><a href="/" aria-label="Linamira acasă"><img src="/wp-content/themes/linamira/assets/img/logo_linamira_bold.svg" alt="Linamira" class="lm-footer-logo-image" width="1285" height="130" loading="lazy" decoding="async" /></a></figure>
+        <!-- /wp:image -->
         <p>Arome, lumânări și produse de răsfăț pentru seri liniștite acasă.</p>
         <address class="lm-footer-company">
           <strong>ID BOLT SERVICES SRL</strong><br>
@@ -17,24 +19,42 @@
 
       <section class="lm-footer-nav" aria-label="Magazin">
         <h2>Magazin</h2>
-        <!-- wp:linamira/navigation-menu {"location":"footer_shop","ariaLabel":"Magazin","className":"lm-footer-links"} /-->
+        <!-- wp:navigation {"ariaLabel":"Magazin","className":"lm-footer-links","overlayMenu":"never","layout":{"type":"flex","orientation":"vertical"}} -->
+          <!-- wp:navigation-link {"label":"Parfum pentru casă","url":"/categorie-produs/parfum-pentru-casa/","kind":"custom","isTopLevelLink":true} /-->
+          <!-- wp:navigation-link {"label":"Lumânări &amp; ceară parfumată","url":"/categorie-produs/lumanari-ceara-parfumata/","kind":"custom","isTopLevelLink":true} /-->
+          <!-- wp:navigation-link {"label":"Difuzoare de arome","url":"/categorie-produs/difuzoare-de-arome/","kind":"custom","isTopLevelLink":true} /-->
+          <!-- wp:navigation-link {"label":"Baie &amp; duș","url":"/categorie-produs/baie-dus/","kind":"custom","isTopLevelLink":true} /-->
+          <!-- wp:navigation-link {"label":"Săpunuri &amp; flori de săpun","url":"/categorie-produs/sapunuri/","kind":"custom","isTopLevelLink":true} /-->
+          <!-- wp:navigation-link {"label":"Accesorii &amp; cadouri mici","url":"/categorie-produs/accesorii-cadouri-mici/","kind":"custom","isTopLevelLink":true} /-->
+        <!-- /wp:navigation -->
       </section>
 
       <section class="lm-footer-nav" aria-label="Asistență">
         <h2>Asistență</h2>
-        <!-- wp:linamira/navigation-menu {"location":"footer_support","ariaLabel":"Asistență","className":"lm-footer-links"} /-->
+        <!-- wp:navigation {"ariaLabel":"Asistență","className":"lm-footer-links","overlayMenu":"never","layout":{"type":"flex","orientation":"vertical"}} -->
+          <!-- wp:navigation-link {"label":"Contact","url":"/contact/","kind":"custom","isTopLevelLink":true} /-->
+          <!-- wp:navigation-link {"label":"Livrare și plată","url":"/livrare-si-plata/","kind":"custom","isTopLevelLink":true} /-->
+          <!-- wp:navigation-link {"label":"Retur și rambursare","url":"/retur-si-rambursare/","kind":"custom","isTopLevelLink":true} /-->
+          <!-- wp:navigation-link {"label":"ANPC / SAL","url":"/anpc-sal/","kind":"custom","isTopLevelLink":true} /-->
+        <!-- /wp:navigation -->
       </section>
 
       <section class="lm-footer-nav" aria-label="Legal">
         <h2>Legal</h2>
-        <!-- wp:linamira/navigation-menu {"location":"footer_legal","ariaLabel":"Legal","className":"lm-footer-links"} /-->
+        <!-- wp:navigation {"ariaLabel":"Legal","className":"lm-footer-links","overlayMenu":"never","layout":{"type":"flex","orientation":"vertical"}} -->
+          <!-- wp:navigation-link {"label":"Termeni și condiții","url":"/termeni-si-conditii/","kind":"custom","isTopLevelLink":true} /-->
+          <!-- wp:navigation-link {"label":"Politica de confidențialitate","url":"/politica-de-confidentialitate/","kind":"custom","isTopLevelLink":true} /-->
+          <!-- wp:navigation-link {"label":"Politica de cookies","url":"/politica-cookies/","kind":"custom","isTopLevelLink":true} /-->
+        <!-- /wp:navigation -->
       </section>
     </div>
 
     <section class="lm-footer-anpc" aria-labelledby="lm-footer-anpc-heading">
       <h2 id="lm-footer-anpc-heading">Soluționarea litigiilor</h2>
       <div class="lm-footer-anpc-links">
-        <!-- wp:linamira/anpc-sal-link /-->
+        <!-- wp:image {"width":"250px","height":"62px","sizeSlug":"full","linkDestination":"custom","className":"lm-footer-anpc-link"} -->
+        <figure class="wp-block-image size-full is-resized lm-footer-anpc-link"><a href="https://reclamatiisal.anpc.ro/" target="_blank" rel="nofollow noopener noreferrer"><img src="/wp-content/themes/linamira/assets/img/anpc/anpc-sal.png" alt="Soluționarea Alternativă a Litigiilor" style="width:250px;height:62px" width="250" height="62" loading="lazy" decoding="async" /></a></figure>
+        <!-- /wp:image -->
       </div>
     </section>
 
