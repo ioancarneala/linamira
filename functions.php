@@ -247,6 +247,107 @@ function linamira_asset_version(string $relative_path): string
     return wp_get_theme()->get('Version');
 }
 
+function linamira_header_template_schema(): string
+{
+    return 'linamira-header-schema:v0.2.3-native-search';
+}
+
+function linamira_theme_file_header_content(): string
+{
+    $path = get_theme_file_path('parts/header.html');
+
+    return file_exists($path) ? (string) file_get_contents($path) : '';
+}
+
+function linamira_header_template_part_needs_reset(string $content): bool
+{
+    if (str_contains($content, linamira_header_template_schema())) {
+        return false;
+    }
+
+    $legacy_markers = [
+        'linamira/navigation-menu',
+        'linamira/logo',
+        'lm-menu-toggle',
+        'lm-menu-panel',
+        'data-lm-header',
+        'lm-site-header',
+        'lm-desktop-nav',
+    ];
+
+    foreach ($legacy_markers as $marker) {
+        if (str_contains($content, $marker)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function linamira_is_header_template_part(WP_Post $post): bool
+{
+    $name = (string) $post->post_name;
+    $title = strtolower(trim((string) $post->post_title));
+
+    if ('header' !== $name && ! str_ends_with($name, '//header') && ! str_contains($name, 'header') && 'header' !== $title) {
+        return false;
+    }
+
+    $terms = wp_get_object_terms($post->ID, 'wp_theme', ['fields' => 'names']);
+
+    if (is_wp_error($terms) || empty($terms)) {
+        return true;
+    }
+
+    return in_array(get_stylesheet(), $terms, true);
+}
+
+function linamira_reset_legacy_header_template_part(): void
+{
+    $current_version = (string) wp_get_theme()->get('Version');
+    $migration_key = 'linamira_header_template_schema_version';
+
+    if (get_option($migration_key) === $current_version) {
+        return;
+    }
+
+    $theme_header = linamira_theme_file_header_content();
+
+    if ('' === $theme_header || ! str_contains($theme_header, linamira_header_template_schema())) {
+        return;
+    }
+
+    $template_parts = get_posts(
+        [
+            'post_type' => 'wp_template_part',
+            'post_status' => ['publish', 'draft', 'auto-draft'],
+            'posts_per_page' => -1,
+            'suppress_filters' => false,
+        ]
+    );
+
+    foreach ($template_parts as $template_part) {
+        if (! $template_part instanceof WP_Post || ! linamira_is_header_template_part($template_part)) {
+            continue;
+        }
+
+        if (! linamira_header_template_part_needs_reset((string) $template_part->post_content)) {
+            continue;
+        }
+
+        wp_update_post(
+            [
+                'ID' => $template_part->ID,
+                'post_content' => $theme_header,
+                'post_status' => 'publish',
+            ]
+        );
+        update_post_meta($template_part->ID, '_linamira_header_template_reset', $current_version);
+    }
+
+    update_option($migration_key, $current_version, false);
+}
+
 add_action('after_setup_theme', function (): void {
     add_theme_support('woocommerce');
     add_theme_support('wp-block-styles');
@@ -323,6 +424,9 @@ function linamira_seed_default_site_logo(): void
 
 add_action('after_switch_theme', 'linamira_seed_default_site_logo');
 add_action('admin_init', 'linamira_seed_default_site_logo');
+add_action('after_switch_theme', 'linamira_reset_legacy_header_template_part');
+add_action('admin_init', 'linamira_reset_legacy_header_template_part');
+add_action('init', 'linamira_reset_legacy_header_template_part', 20);
 
 add_action('wp_enqueue_scripts', function (): void {
     wp_enqueue_style(
