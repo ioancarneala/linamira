@@ -1,0 +1,6 @@
+{
+  "private": true,
+  "scripts": {
+    "version:theme": "node scripts/bump-theme-version.mjs"
+  }
+}
