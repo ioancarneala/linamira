@@ -190,29 +190,38 @@ add_filter('themes_api', function ($result, string $action, $args) {
 }, 10, 3);
 
 add_filter('upgrader_source_selection', function ($source, $remote_source, $upgrader, $hook_extra) {
-    unset($upgrader);
-
-    if (
-        ! is_array($hook_extra)
-        || 'theme' !== ($hook_extra['type'] ?? '')
-        || linamira_update_stylesheet() !== ($hook_extra['theme'] ?? '')
-    ) {
-        return $source;
-    }
+    unset($upgrader, $hook_extra);
 
     global $wp_filesystem;
 
-    if (! $wp_filesystem || linamira_update_stylesheet() === basename(untrailingslashit((string) $source))) {
+    $source_path = untrailingslashit((string) $source);
+
+    if (! $wp_filesystem || linamira_update_stylesheet() === basename($source_path)) {
         return $source;
     }
 
-    $target = trailingslashit((string) $remote_source) . linamira_update_stylesheet();
+    $style_path = trailingslashit($source_path) . 'style.css';
+
+    if (! $wp_filesystem->exists($style_path)) {
+        return $source;
+    }
+
+    $style_headers = (string) $wp_filesystem->get_contents($style_path);
+    $text_domain = linamira_update_header_from_string($style_headers, 'Text Domain');
+    $theme_name = linamira_update_header_from_string($style_headers, 'Theme Name');
+
+    if (linamira_update_stylesheet() !== $text_domain && 'LINAMIRA' !== $theme_name) {
+        return $source;
+    }
+
+    $target_root = '' !== (string) $remote_source ? (string) $remote_source : dirname($source_path);
+    $target = trailingslashit($target_root) . linamira_update_stylesheet();
 
     if ($wp_filesystem->exists($target)) {
         $wp_filesystem->delete($target, true);
     }
 
-    return $wp_filesystem->move((string) $source, $target, true) ? $target : $source;
+    return $wp_filesystem->move($source_path, $target, true) ? $target : $source;
 }, 10, 4);
 
 function linamira_asset_version(string $relative_path): string
