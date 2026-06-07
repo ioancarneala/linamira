@@ -69,7 +69,7 @@ function linamira_update_metadata(): array
 
     $branch = linamira_update_branch();
     $encoded_branch = linamira_update_encode_branch($branch);
-    $style_url = sprintf('https://raw.githubusercontent.com/%s/%s/style.css', $repository, $encoded_branch);
+    $style_url = sprintf('https://api.github.com/repos/%s/contents/style.css?ref=%s', $repository, $encoded_branch);
     $package_url = sprintf('https://github.com/%s/archive/refs/heads/%s.zip', $repository, $encoded_branch);
     $project_url = sprintf('https://github.com/%s', $repository);
 
@@ -77,7 +77,7 @@ function linamira_update_metadata(): array
         $style_url,
         [
             'headers' => [
-                'Accept' => 'text/plain',
+                'Accept' => 'application/vnd.github.raw',
                 'User-Agent' => 'LINAMIRA theme updater; ' . home_url('/'),
             ],
             'redirection' => 3,
