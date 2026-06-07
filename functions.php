@@ -9,6 +9,18 @@ if (! defined('ABSPATH')) {
 
 function linamira_update_stylesheet(): string
 {
+    $stylesheet = function_exists('get_stylesheet') ? (string) get_stylesheet() : 'linamira';
+    $theme = function_exists('wp_get_theme') ? wp_get_theme($stylesheet) : null;
+
+    if ($theme instanceof WP_Theme && $theme->exists()) {
+        $text_domain = (string) $theme->get('TextDomain');
+        $theme_name = (string) $theme->get('Name');
+
+        if ('linamira' === $text_domain || 'LINAMIRA' === $theme_name) {
+            return $stylesheet;
+        }
+    }
+
     return 'linamira';
 }
 
