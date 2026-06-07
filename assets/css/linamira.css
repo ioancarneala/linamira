@@ -589,31 +589,29 @@ body.has-modal-open .lm-desktop-nav .wp-block-navigation__responsive-container-o
 }
 
 .lm-desktop-nav .wp-block-navigation__responsive-container.is-menu-open {
-    --lm-mobile-announcement-height: 2.1rem;
-    --lm-mobile-header-height: clamp(4rem, 13vw, 4.875rem);
-    --lm-mobile-menu-button-size: 40px;
+    --lm-mobile-header-overlay-end: var(--lm-header-offset, calc(2.1rem + clamp(4rem, 13vw, 4.875rem)));
     top: 0;
     background-color: transparent !important;
     background: linear-gradient(
         to bottom,
         transparent 0,
-        transparent calc(var(--lm-mobile-announcement-height) + var(--lm-mobile-header-height)),
-        var(--wp--preset--color--white-warm) calc(var(--lm-mobile-announcement-height) + var(--lm-mobile-header-height))
+        transparent var(--lm-mobile-header-overlay-end),
+        var(--wp--preset--color--white-warm) var(--lm-mobile-header-overlay-end)
     );
     color: var(--wp--preset--color--soft-black);
-    padding: calc(var(--lm-mobile-announcement-height) + var(--lm-mobile-header-height) + var(--wp--preset--spacing--sm)) var(--wp--preset--spacing--md) var(--wp--preset--spacing--xl);
+    padding: calc(var(--lm-mobile-header-overlay-end) + var(--wp--preset--spacing--sm)) var(--wp--preset--spacing--md) var(--wp--preset--spacing--xl);
 }
 
 .lm-desktop-nav .wp-block-navigation__responsive-container.is-menu-open .wp-block-navigation__responsive-container-close {
     position: fixed;
-    inset-block-start: calc(var(--lm-mobile-announcement-height) + ((var(--lm-mobile-header-height) - var(--lm-mobile-menu-button-size)) / 2));
-    inset-inline-start: clamp(1rem, 2vw, 3rem);
+    inset-block-start: var(--lm-mobile-menu-button-top, calc(2.1rem + ((clamp(4rem, 13vw, 4.875rem) - var(--lm-mobile-menu-button-size, 40px)) / 2)));
+    inset-inline-start: var(--lm-mobile-menu-button-left, clamp(1rem, 2vw, 3rem));
     inset-inline-end: auto;
     z-index: 100001;
     display: inline-grid;
     place-items: center;
-    width: var(--lm-mobile-menu-button-size);
-    height: var(--lm-mobile-menu-button-size);
+    width: var(--lm-mobile-menu-button-size, 40px);
+    height: var(--lm-mobile-menu-button-size, 40px);
     padding: 0;
     color: var(--wp--preset--color--soft-black);
 }

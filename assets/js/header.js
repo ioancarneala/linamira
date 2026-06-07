@@ -1,4 +1,105 @@
 (function () {
+    const root = document.documentElement;
+    const header = document.querySelector(".lm-site-header");
+    const announcement = document.querySelector(".lm-announcement");
+    const nav = document.querySelector(".lm-desktop-nav");
+    const openButton = nav ? nav.querySelector(".wp-block-navigation__responsive-container-open") : null;
+    const topNoticeSelector = [
+        "#wpadminbar",
+        ".woocommerce-store-notice",
+        ".woocommerce-store-notice__notice",
+        ".demo_store",
+    ].join(",");
+    let frame = 0;
+
+    const isVisible = (element) => {
+        if (!element) {
+            return false;
+        }
+
+        const style = window.getComputedStyle(element);
+
+        return style.display !== "none" && style.visibility !== "hidden" && style.opacity !== "0";
+    };
+
+    const measureTopNotices = (limit) => {
+        let bottom = 0;
+
+        document.querySelectorAll(topNoticeSelector).forEach((element) => {
+            if (!isVisible(element)) {
+                return;
+            }
+
+            const rect = element.getBoundingClientRect();
+            const position = window.getComputedStyle(element).position;
+            const isTopLayer = position === "fixed" || position === "sticky" || rect.top <= 4;
+
+            if (!isTopLayer || rect.height <= 0 || rect.top > limit || rect.bottom > window.innerHeight * 0.55) {
+                return;
+            }
+
+            bottom = Math.max(bottom, rect.bottom);
+        });
+
+        return bottom;
+    };
+
+    const updateHeaderMetrics = () => {
+        frame = 0;
+
+        const headerRect = header ? header.getBoundingClientRect() : null;
+        const announcementRect = announcement ? announcement.getBoundingClientRect() : null;
+        const openRect = openButton ? openButton.getBoundingClientRect() : null;
+        const headerBottom = Math.max(
+            headerRect ? headerRect.bottom : 0,
+            announcementRect ? announcementRect.bottom : 0,
+            openRect ? openRect.bottom : 0
+        );
+        const noticeBottom = measureTopNotices(Math.max(headerBottom, 160));
+        const offset = Math.ceil(Math.max(headerBottom, noticeBottom, 0));
+
+        root.style.setProperty("--lm-header-offset", `${offset}px`);
+        root.style.setProperty("--lm-mobile-header-overlay-end", `${offset}px`);
+
+        if (!openRect || openRect.width <= 0 || openRect.height <= 0) {
+            return;
+        }
+
+        root.style.setProperty("--lm-mobile-menu-button-top", `${Math.round(Math.max(openRect.top, noticeBottom))}px`);
+        root.style.setProperty("--lm-mobile-menu-button-left", `${Math.round(openRect.left)}px`);
+        root.style.setProperty("--lm-mobile-menu-button-size", `${Math.round(openRect.width)}px`);
+    };
+
+    const requestUpdate = () => {
+        if (frame) {
+            return;
+        }
+
+        frame = window.requestAnimationFrame(updateHeaderMetrics);
+    };
+
+    requestUpdate();
+    window.addEventListener("load", requestUpdate);
+    window.addEventListener("resize", requestUpdate);
+    window.addEventListener("orientationchange", requestUpdate);
+    window.addEventListener("scroll", requestUpdate, { passive: true });
+
+    if (openButton) {
+        openButton.addEventListener("pointerdown", updateHeaderMetrics);
+        openButton.addEventListener("click", updateHeaderMetrics);
+    }
+
+    if ("MutationObserver" in window) {
+        const observer = new MutationObserver(requestUpdate);
+        observer.observe(document.body, {
+            attributes: true,
+            childList: true,
+            subtree: true,
+        });
+    }
+})();
+
+(function () {
     const config = window.linamiraSearch || {};
     const endpoint = config.endpoint;
     const forms = [...document.querySelectorAll(".lm-header-search, .lm-mobile-menu-search")];
@@ -7,8 +108,6 @@
         return;
     }
 
-    const header = document.querySelector(".lm-site-header");
-    const announcement = document.querySelector(".lm-announcement");
     const minChars = Number(config.minChars || 2);
     const limit = Number(config.limit || 6);
     const strings = {
@@ -21,14 +120,6 @@
         ...(config.strings || {}),
     };
     const state = new WeakMap();
-
-    const updateHeaderOffset = () => {
-        const headerBottom = header ? header.getBoundingClientRect().bottom : 0;
-        const announcementBottom = announcement ? announcement.getBoundingClientRect().bottom : 0;
-        const offset = Math.max(headerBottom, announcementBottom, 0);
-
-        document.documentElement.style.setProperty("--lm-header-offset", `${Math.ceil(offset)}px`);
-    };
 
     const escapeHTML = (value) =>
         String(value || "")
@@ -273,10 +364,6 @@
             }
         });
     });
-
-    updateHeaderOffset();
-    window.addEventListener("resize", updateHeaderOffset);
-    window.addEventListener("load", updateHeaderOffset);
 
     document.addEventListener("click", (event) => {
         forms.forEach((form) => {
