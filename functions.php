@@ -247,33 +247,82 @@ function linamira_asset_version(string $relative_path): string
     return wp_get_theme()->get('Version');
 }
 
-function linamira_get_cart_count(): int
-{
-    if (! function_exists('WC') || ! WC()->cart) {
-        return 0;
-    }
-
-    return max(0, (int) WC()->cart->get_cart_contents_count());
-}
-
-function linamira_get_cart_count_markup(): string
-{
-    $count = linamira_get_cart_count();
-
-    return sprintf(
-        '<span class="lm-cart-count%s" data-lm-cart-count aria-hidden="true">%d</span>',
-        $count > 0 ? ' is-visible' : '',
-        $count
-    );
-}
-
 add_action('after_setup_theme', function (): void {
     add_theme_support('woocommerce');
     add_theme_support('wp-block-styles');
     add_theme_support('editor-styles');
+    add_theme_support(
+        'custom-logo',
+        [
+            'height' => 130,
+            'width' => 1285,
+            'flex-height' => true,
+            'flex-width' => true,
+        ]
+    );
 
     add_editor_style('assets/css/linamira.css');
 });
+
+function linamira_seed_default_site_logo(): void
+{
+    if ((int) get_theme_mod('custom_logo') > 0) {
+        return;
+    }
+
+    $existing = get_posts(
+        [
+            'fields' => 'ids',
+            'meta_key' => '_linamira_default_site_logo',
+            'meta_value' => '1',
+            'post_type' => 'attachment',
+            'post_status' => 'inherit',
+            'posts_per_page' => 1,
+        ]
+    );
+
+    if (! empty($existing[0])) {
+        set_theme_mod('custom_logo', (int) $existing[0]);
+        return;
+    }
+
+    $source = get_theme_file_path('assets/img/logo_linamira_bold.png');
+
+    if (! file_exists($source)) {
+        return;
+    }
+
+    $upload = wp_upload_bits('linamira-logo.png', null, (string) file_get_contents($source));
+
+    if (! empty($upload['error']) || empty($upload['file'])) {
+        return;
+    }
+
+    $attachment_id = wp_insert_attachment(
+        [
+            'post_title' => 'LINAMIRA Logo',
+            'post_mime_type' => 'image/png',
+            'post_status' => 'inherit',
+        ],
+        (string) $upload['file']
+    );
+
+    if (is_wp_error($attachment_id)) {
+        return;
+    }
+
+    require_once ABSPATH . 'wp-admin/includes/image.php';
+
+    wp_update_attachment_metadata(
+        (int) $attachment_id,
+        wp_generate_attachment_metadata((int) $attachment_id, (string) $upload['file'])
+    );
+    update_post_meta((int) $attachment_id, '_linamira_default_site_logo', '1');
+    set_theme_mod('custom_logo', (int) $attachment_id);
+}
+
+add_action('after_switch_theme', 'linamira_seed_default_site_logo');
+add_action('admin_init', 'linamira_seed_default_site_logo');
 
 add_action('wp_enqueue_scripts', function (): void {
     wp_enqueue_style(
@@ -290,33 +339,6 @@ add_action('wp_enqueue_scripts', function (): void {
         linamira_asset_version('assets/js/header.js'),
         true
     );
-    wp_localize_script(
-        'linamira-header',
-        'linamiraSearch',
-        [
-            'endpoint' => esc_url_raw(rest_url('linamira/v1/product-search')),
-            'minChars' => 2,
-            'limit' => 6,
-            'strings' => [
-                'loading' => __('Căutăm produse...', 'linamira'),
-                'ready' => __('Rezultate rapide', 'linamira'),
-                'empty' => __('Nu am găsit produse pentru această căutare.', 'linamira'),
-                'hint' => __('Încearcă: lumânare, ulei, săpun sau difuzor.', 'linamira'),
-                'allResults' => __('Vezi toate rezultatele', 'linamira'),
-                'error' => __('Căutarea nu este disponibilă momentan.', 'linamira'),
-            ],
-        ]
-    );
-    wp_localize_script(
-        'linamira-header',
-        'linamiraHeader',
-        [
-            'cartCount' => linamira_get_cart_count(),
-            'cartLabel' => __('Coș', 'linamira'),
-            'cartLabelSingular' => __('Coș, 1 produs', 'linamira'),
-            'cartLabelPlural' => __('Coș, %d produse', 'linamira'),
-        ]
-    );
     wp_script_add_data('linamira-header', 'strategy', 'defer');
 
     if (function_exists('is_checkout') && is_checkout()) {
@@ -330,118 +352,6 @@ add_action('wp_enqueue_scripts', function (): void {
         wp_script_add_data('linamira-checkout', 'strategy', 'defer');
     }
 });
-
-add_filter('woocommerce_add_to_cart_fragments', function (array $fragments): array {
-    $fragments['.lm-header-cart .lm-cart-count'] = linamira_get_cart_count_markup();
-
-    return $fragments;
-});
-
-add_action('rest_api_init', function (): void {
-    register_rest_route(
-        'linamira/v1',
-        '/product-search',
-        [
-            'methods' => WP_REST_Server::READABLE,
-            'permission_callback' => '__return_true',
-            'args' => [
-                'search' => [
-                    'type' => 'string',
-                    'required' => true,
-                    'sanitize_callback' => 'sanitize_text_field',
-                ],
-                'limit' => [
-                    'type' => 'integer',
-                    'default' => 6,
-                    'sanitize_callback' => 'absint',
-                ],
-            ],
-            'callback' => 'linamira_rest_product_search',
-        ]
-    );
-});
-
-function linamira_rest_product_search(WP_REST_Request $request): WP_REST_Response
-{
-    if (! function_exists('wc_get_product')) {
-        return rest_ensure_response(
-            [
-                'items' => [],
-                'searchUrl' => home_url('/?s=' . rawurlencode((string) $request->get_param('search'))),
-            ]
-        );
-    }
-
-    $term = trim((string) $request->get_param('search'));
-    $limit = min(8, max(1, absint($request->get_param('limit') ?: 6)));
-
-    if (mb_strlen($term) < 2) {
-        return rest_ensure_response(
-            [
-                'items' => [],
-                'searchUrl' => home_url('/?s=' . rawurlencode($term) . '&post_type=product'),
-            ]
-        );
-    }
-
-    $query = new WP_Query(
-        [
-            'fields' => 'ids',
-            'no_found_rows' => true,
-            'orderby' => 'relevance',
-            'post_status' => 'publish',
-            'post_type' => 'product',
-            'posts_per_page' => $limit,
-            's' => $term,
-            'tax_query' => [
-                [
-                    'taxonomy' => 'product_visibility',
-                    'field' => 'name',
-                    'terms' => ['exclude-from-search', 'exclude-from-catalog'],
-                    'operator' => 'NOT IN',
-                ],
-            ],
-        ]
-    );
-
-    $items = [];
-
-    foreach ($query->posts as $product_id) {
-        $product = wc_get_product((int) $product_id);
-
-        if (! $product instanceof WC_Product || ! $product->is_visible()) {
-            continue;
-        }
-
-        $image_id = $product->get_image_id();
-        $image_url = $image_id ? wp_get_attachment_image_url($image_id, 'woocommerce_thumbnail') : '';
-
-        if (! $image_url) {
-            $image_url = wc_placeholder_img_src('woocommerce_thumbnail');
-        }
-
-        $categories = wp_get_post_terms((int) $product_id, 'product_cat', ['fields' => 'names']);
-        $excerpt = linamira_normalize_meta_description($product->get_short_description());
-
-        $items[] = [
-            'id' => (int) $product_id,
-            'title' => html_entity_decode($product->get_name(), ENT_QUOTES, get_bloginfo('charset')),
-            'url' => get_permalink((int) $product_id),
-            'image' => esc_url_raw($image_url),
-            'imageAlt' => $product->get_name(),
-            'priceHtml' => wp_kses_post($product->get_price_html()),
-            'category' => ! empty($categories) ? html_entity_decode((string) $categories[0], ENT_QUOTES, get_bloginfo('charset')) : '',
-            'excerpt' => $excerpt,
-        ];
-    }
-
-    return rest_ensure_response(
-        [
-            'items' => $items,
-            'searchUrl' => home_url('/?s=' . rawurlencode($term) . '&post_type=product'),
-        ]
-    );
-}
 
 function linamira_normalize_meta_description(string $description): string
 {

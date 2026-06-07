@@ -1,21 +1,18 @@
-<div class="lm-announcement">
-  <div class="lm-container">
-    Transport gratuit la comenzi peste 200 lei
-  </div>
+<!-- wp:group {"className":"lm-announcement","layout":{"type":"constrained"}} -->
+<div class="wp-block-group lm-announcement">
+  <!-- wp:paragraph {"className":"lm-container"} -->
+  <p class="lm-container">Transport gratuit la comenzi peste 200 lei</p>
+  <!-- /wp:paragraph -->
 </div>
+<!-- /wp:group -->
 
-<div class="lm-site-header" data-lm-header>
-  <div class="lm-container lm-header-inner">
-    <div class="lm-header-left">
-      <button class="lm-menu-toggle" type="button" aria-controls="lm-menu-panel" aria-expanded="false" aria-label="Meniu">
-        <span class="lm-menu-icon" aria-hidden="true">
-          <span></span>
-          <span></span>
-          <span></span>
-        </span>
-        <span class="lm-menu-toggle-text" aria-hidden="true">Meniu</span>
-      </button>
-      <!-- wp:navigation {"ariaLabel":"Navigare principală","className":"lm-desktop-nav","overlayMenu":"never","layout":{"type":"flex","flexWrap":"nowrap"}} -->
+<!-- wp:group {"tagName":"header","className":"lm-site-header","layout":{"type":"constrained"}} -->
+<header class="wp-block-group lm-site-header">
+  <!-- wp:group {"className":"lm-container lm-header-inner","layout":{"type":"default"}} -->
+  <div class="wp-block-group lm-container lm-header-inner">
+    <!-- wp:group {"className":"lm-header-left","layout":{"type":"flex","flexWrap":"nowrap"}} -->
+    <div class="wp-block-group lm-header-left">
+      <!-- wp:navigation {"ariaLabel":"Navigare principală","className":"lm-desktop-nav","overlayMenu":"always","layout":{"type":"flex","flexWrap":"nowrap"}} -->
         <!-- wp:navigation-link {"label":"Acasă","url":"/","kind":"custom","isTopLevelLink":true} /-->
         <!-- wp:navigation-link {"label":"Parfum pentru casă","url":"/categorie-produs/parfum-pentru-casa/","kind":"custom","isTopLevelLink":true} /-->
         <!-- wp:navigation-link {"label":"Lumânări","url":"/categorie-produs/lumanari-ceara-parfumata/","kind":"custom","isTopLevelLink":true} /-->
@@ -25,88 +22,18 @@
         <!-- wp:navigation-link {"label":"Accesorii","url":"/categorie-produs/accesorii-cadouri-mici/","kind":"custom","isTopLevelLink":true} /-->
       <!-- /wp:navigation -->
     </div>
+    <!-- /wp:group -->
 
-    <a class="lm-wordmark" href="/" aria-label="Linamira acasă">
-      <img class="lm-logo-image" src="/wp-content/themes/linamira/assets/img/logo_linamira_bold.svg" alt="Linamira" width="1285" height="130" decoding="async" />
-    </a>
+    <!-- wp:site-logo {"width":200,"className":"lm-wordmark"} /-->
 
-    <nav class="lm-header-actions" aria-label="Linkuri utile">
-      <form class="lm-header-search" role="search" method="get" action="/" data-lm-search>
-        <label class="lm-sr-only" for="lm-header-search-input">Caută produse</label>
-        <input id="lm-header-search-input" type="search" name="s" placeholder="Caută" autocomplete="off" aria-autocomplete="list" aria-expanded="false" aria-controls="lm-header-search-results" data-lm-search-input />
-        <input type="hidden" name="post_type" value="product" />
-        <button class="lm-icon-link lm-search-submit" type="submit" aria-label="Caută">
-          <svg class="lm-icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <circle cx="10.75" cy="10.75" r="5.75" fill="none" stroke="currentColor" stroke-width="1.4" />
-            <path d="m15.1 15.1 4.15 4.15" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
-          </svg>
-        </button>
-        <div class="lm-search-panel" id="lm-header-search-results" data-lm-search-results role="region" aria-label="Rezultate căutare" hidden></div>
-      </form>
-      <a class="lm-icon-link lm-header-account" href="/my-account/" aria-label="Contul meu">
-        <svg class="lm-icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <circle cx="12" cy="7.75" r="3.15" fill="none" stroke="currentColor" stroke-width="1.4" />
-          <path d="M5.75 19.25a6.25 6.25 0 0 1 12.5 0" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
-        </svg>
-        <span class="lm-sr-only">Contul meu</span>
-      </a>
-      <a class="lm-icon-link lm-header-cart" href="/cart/" aria-label="Coș">
-        <svg class="lm-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path d="M6.75 8.75h10.5l-.75 10.5h-9l-.75-10.5Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" />
-          <path d="M9 8.75V7a3 3 0 0 1 6 0v1.75" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
-        </svg>
-        <span class="lm-cart-count" data-lm-cart-count aria-hidden="true">0</span>
-        <span class="lm-sr-only">Coș</span>
-      </a>
+    <!-- wp:group {"tagName":"nav","className":"lm-header-actions","layout":{"type":"flex","flexWrap":"nowrap","justifyContent":"right"}} -->
+    <nav class="wp-block-group lm-header-actions">
+      <!-- wp:search {"label":"Caută produse","showLabel":false,"placeholder":"Caută","buttonUseIcon":true,"buttonPosition":"button-inside","query":{"post_type":"product"},"className":"lm-header-search"} /-->
+      <!-- wp:woocommerce/customer-account {"displayStyle":"icon_only","className":"lm-header-account"} /-->
+      <!-- wp:woocommerce/cart-link {"cartIcon":"bag","className":"lm-header-cart"} /-->
     </nav>
+    <!-- /wp:group -->
   </div>
-</div>
-
-<div class="lm-menu-panel" id="lm-menu-panel" aria-hidden="true" hidden>
-  <div class="lm-menu-panel-inner">
-    <form class="lm-menu-search" role="search" method="get" action="/" data-lm-search>
-      <label class="lm-sr-only" for="lm-menu-search-input">Caută produse</label>
-      <input id="lm-menu-search-input" type="search" name="s" placeholder="Caută produse" autocomplete="off" aria-autocomplete="list" aria-expanded="false" aria-controls="lm-menu-search-results" data-lm-search-input />
-      <input type="hidden" name="post_type" value="product" />
-      <button class="lm-icon-link" type="submit" aria-label="Caută">
-        <svg class="lm-icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <circle cx="10.75" cy="10.75" r="5.75" fill="none" stroke="currentColor" stroke-width="1.4" />
-          <path d="m15.1 15.1 4.15 4.15" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
-        </svg>
-      </button>
-      <div class="lm-search-panel" id="lm-menu-search-results" data-lm-search-results role="region" aria-label="Rezultate căutare" hidden></div>
-    </form>
-
-    <!-- wp:navigation {"ariaLabel":"Navigare principală","className":"lm-menu-nav","overlayMenu":"never","layout":{"type":"flex","orientation":"vertical"}} -->
-      <!-- wp:navigation-link {"label":"Acasă","url":"/","kind":"custom","isTopLevelLink":true} /-->
-      <!-- wp:navigation-link {"label":"Parfum pentru casă","url":"/categorie-produs/parfum-pentru-casa/","kind":"custom","isTopLevelLink":true} /-->
-      <!-- wp:navigation-link {"label":"Lumânări &amp; ceară parfumată","url":"/categorie-produs/lumanari-ceara-parfumata/","kind":"custom","isTopLevelLink":true} /-->
-      <!-- wp:navigation-link {"label":"Difuzoare de arome","url":"/categorie-produs/difuzoare-de-arome/","kind":"custom","isTopLevelLink":true} /-->
-      <!-- wp:navigation-link {"label":"Baie &amp; duș","url":"/categorie-produs/baie-dus/","kind":"custom","isTopLevelLink":true} /-->
-      <!-- wp:navigation-link {"label":"Săpunuri","url":"/categorie-produs/sapunuri/","kind":"custom","isTopLevelLink":true} /-->
-      <!-- wp:navigation-link {"label":"Accesorii &amp; cadouri mici","url":"/categorie-produs/accesorii-cadouri-mici/","kind":"custom","isTopLevelLink":true} /-->
-    <!-- /wp:navigation -->
-
-    <a class="lm-menu-feature" href="/categorie-produs/lumanari-ceara-parfumata/">
-      <span>Lumânări &amp; ceară parfumată</span>
-      <small>Arome calde pentru seri liniștite acasă</small>
-    </a>
-
-    <nav class="lm-menu-utilities" aria-label="Linkuri utile">
-      <a href="/my-account/">
-        <svg class="lm-utility-icon" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <circle cx="12" cy="7.75" r="3.15" fill="none" stroke="currentColor" stroke-width="1.4" />
-          <path d="M5.75 19.25a6.25 6.25 0 0 1 12.5 0" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
-        </svg>
-        <span>Contul meu</span>
-      </a>
-      <a href="/contact/">
-        <svg class="lm-utility-icon" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path d="M5.25 7.25h13.5v9.5H5.25z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" />
-          <path d="m5.75 7.75 6.25 4.6 6.25-4.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-        <span>Contact</span>
-      </a>
-    </nav>
-  </div>
-</div>
+  <!-- /wp:group -->
+</header>
+<!-- /wp:group -->
