@@ -1,5 +1,35 @@
 (function () {
     const root = document.documentElement;
+    const storeNoticeSelector = ".woocommerce-store-notice.demo_store, .woocommerce-store-notice__notice";
+    const prepareStoreNotice = () => {
+        const notice = document.querySelector(storeNoticeSelector);
+
+        document.body.classList.toggle("lm-has-store-notice", Boolean(notice));
+
+        if (!notice) {
+            root.style.removeProperty("--lm-store-notice-height");
+            return;
+        }
+
+        if (notice.dataset.lmStoreNoticeReady !== "1") {
+            notice.classList.add("lm-store-notice");
+            notice.dataset.lmStoreNoticeReady = "1";
+
+            const dismiss = notice.querySelector(".woocommerce-store-notice__dismiss-link");
+
+            if (dismiss) {
+                dismiss.remove();
+            }
+        }
+
+        if (!isVisible(notice)) {
+            root.style.removeProperty("--lm-store-notice-height");
+            return;
+        }
+
+        root.style.setProperty("--lm-store-notice-height", `${Math.ceil(notice.getBoundingClientRect().height)}px`);
+    };
+
     const header = document.querySelector(".lm-site-header");
     const announcement = document.querySelector(".lm-announcement");
     const nav = document.querySelector(".lm-desktop-nav");
@@ -22,8 +52,24 @@
         return style.display !== "none" && style.visibility !== "hidden" && style.opacity !== "0";
     };
 
+    const measureAdminBar = () => {
+        const adminBar = document.getElementById("wpadminbar");
+
+        if (!isVisible(adminBar)) {
+            root.style.setProperty("--lm-store-notice-top", "0px");
+            return 0;
+        }
+
+        const rect = adminBar.getBoundingClientRect();
+        const bottom = Math.max(0, rect.bottom);
+
+        root.style.setProperty("--lm-store-notice-top", `${Math.ceil(bottom)}px`);
+
+        return bottom;
+    };
+
     const measureTopNotices = (limit) => {
-        let bottom = 0;
+        let bottom = measureAdminBar();
 
         document.querySelectorAll(topNoticeSelector).forEach((element) => {
             if (!isVisible(element)) {
@@ -46,6 +92,7 @@
 
     const updateHeaderMetrics = () => {
         frame = 0;
+        prepareStoreNotice();
 
         const headerRect = header ? header.getBoundingClientRect() : null;
         const announcementRect = announcement ? announcement.getBoundingClientRect() : null;

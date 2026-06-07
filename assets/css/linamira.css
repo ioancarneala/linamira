@@ -464,6 +464,48 @@ label {
     margin: 0;
 }
 
+body .woocommerce-store-notice.demo_store,
+body .woocommerce-store-notice__notice {
+    position: fixed;
+    inset-block: var(--lm-store-notice-top, 0) auto;
+    inset-inline: 0;
+    z-index: 99998;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2rem;
+    margin: 0;
+    padding: 0.42rem clamp(1rem, 4vw, 3rem);
+    border-block-end: 1px solid var(--wp--preset--color--soft-border);
+    background: var(--wp--preset--color--warm-cream);
+    box-shadow: 0 10px 28px color-mix(in srgb, var(--wp--preset--color--soft-black) 8%, transparent);
+    color: var(--wp--preset--color--cocoa);
+    font-family: var(--wp--preset--font-family--inter);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.35;
+    text-align: center;
+}
+
+body.admin-bar {
+    --lm-store-notice-top: 32px;
+}
+
+@media (max-width: 782px) {
+    body.admin-bar {
+        --lm-store-notice-top: 46px;
+    }
+}
+
+body.lm-has-store-notice .wp-site-blocks {
+    padding-block-start: var(--lm-store-notice-height, 0);
+}
+
+body .woocommerce-store-notice.demo_store .woocommerce-store-notice__dismiss-link,
+body .woocommerce-store-notice__notice .woocommerce-store-notice__dismiss-link {
+    display: none !important;
+}
+
 .lm-site-header {
     position: relative;
     z-index: 300;
