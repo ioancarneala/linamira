@@ -221,7 +221,7 @@ add_filter('upgrader_source_selection', function ($source, $remote_source, $upgr
         $wp_filesystem->delete($target, true);
     }
 
-    return $wp_filesystem->move($source_path, $target, true) ? $target : $source;
+    return $wp_filesystem->move($source_path, $target, true) ? trailingslashit($target) : $source;
 }, 10, 4);
 
 function linamira_asset_version(string $relative_path): string
