@@ -489,12 +489,6 @@ label {
     min-width: 0;
 }
 
-.lm-wordmark.wp-block-image,
-.lm-footer-wordmark.wp-block-image,
-.lm-footer-anpc-link.wp-block-image {
-    margin: 0;
-}
-
 .lm-wordmark {
     grid-column: 2;
     display: inline-flex;
@@ -791,6 +785,11 @@ body.lm-menu-open {
 
 .lm-menu-panel[hidden] {
     display: none;
+}
+
+.editor-styles-wrapper .lm-menu-panel,
+body.block-editor-iframe__body .lm-menu-panel {
+    display: none !important;
 }
 
 .lm-menu-panel.is-open {
