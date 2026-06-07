@@ -339,6 +339,23 @@ add_action('wp_enqueue_scripts', function (): void {
         linamira_asset_version('assets/js/header.js'),
         true
     );
+    wp_localize_script(
+        'linamira-header',
+        'linamiraSearch',
+        [
+            'endpoint' => esc_url_raw(rest_url('linamira/v1/product-search')),
+            'minChars' => 2,
+            'limit' => 6,
+            'strings' => [
+                'loading' => __('Căutăm produse...', 'linamira'),
+                'ready' => __('Rezultate rapide', 'linamira'),
+                'empty' => __('Nu am găsit produse pentru această căutare.', 'linamira'),
+                'hint' => __('Încearcă: lumânare, ulei, săpun sau difuzor.', 'linamira'),
+                'allResults' => __('Vezi toate rezultatele', 'linamira'),
+                'error' => __('Căutarea nu este disponibilă momentan.', 'linamira'),
+            ],
+        ]
+    );
     wp_script_add_data('linamira-header', 'strategy', 'defer');
 
     if (function_exists('is_checkout') && is_checkout()) {
@@ -352,6 +369,115 @@ add_action('wp_enqueue_scripts', function (): void {
         wp_script_add_data('linamira-checkout', 'strategy', 'defer');
     }
 });
+
+add_action('rest_api_init', function (): void {
+    register_rest_route(
+        'linamira/v1',
+        '/product-search',
+        [
+            'methods' => WP_REST_Server::READABLE,
+            'permission_callback' => '__return_true',
+            'args' => [
+                'search' => [
+                    'type' => 'string',
+                    'required' => true,
+                    'sanitize_callback' => 'sanitize_text_field',
+                ],
+                'limit' => [
+                    'type' => 'integer',
+                    'default' => 6,
+                    'sanitize_callback' => 'absint',
+                ],
+            ],
+            'callback' => 'linamira_rest_product_search',
+        ]
+    );
+});
+
+function linamira_rest_product_search(WP_REST_Request $request): WP_REST_Response
+{
+    $term = trim((string) $request->get_param('search'));
+
+    if (! function_exists('wc_get_product')) {
+        return rest_ensure_response(
+            [
+                'items' => [],
+                'searchUrl' => home_url('/?s=' . rawurlencode($term)),
+            ]
+        );
+    }
+
+    $limit = min(8, max(1, absint($request->get_param('limit') ?: 6)));
+
+    $term_length = function_exists('mb_strlen') ? mb_strlen($term) : strlen($term);
+
+    if ($term_length < 2) {
+        return rest_ensure_response(
+            [
+                'items' => [],
+                'searchUrl' => home_url('/?s=' . rawurlencode($term) . '&post_type=product'),
+            ]
+        );
+    }
+
+    $query = new WP_Query(
+        [
+            'fields' => 'ids',
+            'no_found_rows' => true,
+            'orderby' => 'relevance',
+            'post_status' => 'publish',
+            'post_type' => 'product',
+            'posts_per_page' => $limit,
+            's' => $term,
+            'tax_query' => [
+                [
+                    'taxonomy' => 'product_visibility',
+                    'field' => 'name',
+                    'terms' => ['exclude-from-search', 'exclude-from-catalog'],
+                    'operator' => 'NOT IN',
+                ],
+            ],
+        ]
+    );
+
+    $items = [];
+
+    foreach ($query->posts as $product_id) {
+        $product = wc_get_product((int) $product_id);
+
+        if (! $product instanceof WC_Product || ! $product->is_visible()) {
+            continue;
+        }
+
+        $image_id = $product->get_image_id();
+        $image_url = $image_id ? wp_get_attachment_image_url($image_id, 'woocommerce_thumbnail') : '';
+
+        if (! $image_url) {
+            $image_url = wc_placeholder_img_src('woocommerce_thumbnail');
+        }
+
+        $categories = wp_get_post_terms((int) $product_id, 'product_cat', ['fields' => 'names']);
+        $excerpt = linamira_normalize_meta_description($product->get_short_description());
+
+        $items[] = [
+            'id' => (int) $product_id,
+            'title' => html_entity_decode($product->get_name(), ENT_QUOTES, get_bloginfo('charset')),
+            'url' => get_permalink((int) $product_id),
+            'image' => esc_url_raw($image_url),
+            'imageAlt' => $product->get_name(),
+            'priceHtml' => wp_kses_post($product->get_price_html()),
+            'category' => ! empty($categories) ? html_entity_decode((string) $categories[0], ENT_QUOTES, get_bloginfo('charset')) : '',
+            'excerpt' => $excerpt,
+        ];
+    }
+
+    return rest_ensure_response(
+        [
+            'items' => $items,
+            'searchUrl' => home_url('/?s=' . rawurlencode($term) . '&post_type=product'),
+        ]
+    );
+}
 
 function linamira_normalize_meta_description(string $description): string
 {

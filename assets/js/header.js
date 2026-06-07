@@ -1,4 +1,295 @@
 (function () {
+    const config = window.linamiraSearch || {};
+    const endpoint = config.endpoint;
+    const forms = [...document.querySelectorAll(".lm-header-search, .lm-mobile-menu-search")];
+
+    if (!endpoint || forms.length === 0) {
+        return;
+    }
+
+    const header = document.querySelector(".lm-site-header");
+    const announcement = document.querySelector(".lm-announcement");
+    const minChars = Number(config.minChars || 2);
+    const limit = Number(config.limit || 6);
+    const strings = {
+        loading: "Căutăm produse...",
+        ready: "Rezultate rapide",
+        empty: "Nu am găsit produse pentru această căutare.",
+        hint: "Încearcă: lumânare, ulei, săpun sau difuzor.",
+        allResults: "Vezi toate rezultatele",
+        error: "Căutarea nu este disponibilă momentan.",
+        ...(config.strings || {}),
+    };
+    const state = new WeakMap();
+
+    const updateHeaderOffset = () => {
+        const headerBottom = header ? header.getBoundingClientRect().bottom : 0;
+        const announcementBottom = announcement ? announcement.getBoundingClientRect().bottom : 0;
+        const offset = Math.max(headerBottom, announcementBottom, 0);
+
+        document.documentElement.style.setProperty("--lm-header-offset", `${Math.ceil(offset)}px`);
+    };
+
+    const escapeHTML = (value) =>
+        String(value || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+    const setExpanded = (input, expanded) => {
+        input.setAttribute("aria-expanded", expanded ? "true" : "false");
+    };
+
+    const enhanceForm = (form, index) => {
+        const input = form.querySelector('input[type="search"]');
+
+        if (!input) {
+            return null;
+        }
+
+        const id = input.id || `lm-search-input-${index + 1}`;
+        const panelId = `${id}-results`;
+        let panel = form.querySelector(".lm-search-panel");
+
+        input.id = id;
+        input.autocomplete = "off";
+        input.setAttribute("aria-autocomplete", "list");
+        input.setAttribute("aria-controls", panelId);
+        setExpanded(input, false);
+
+        if (!form.querySelector('input[name="post_type"]')) {
+            const postTypeInput = document.createElement("input");
+            postTypeInput.type = "hidden";
+            postTypeInput.name = "post_type";
+            postTypeInput.value = "product";
+            form.appendChild(postTypeInput);
+        }
+
+        if (!panel) {
+            panel = document.createElement("div");
+            panel.className = "lm-search-panel";
+            panel.hidden = true;
+            form.appendChild(panel);
+        }
+
+        panel.id = panelId;
+        panel.dataset.lmSearchResults = "";
+        panel.setAttribute("role", "region");
+        panel.setAttribute("aria-label", "Rezultate căutare");
+
+        return { input, panel };
+    };
+
+    const getFormParts = (form) => {
+        const input = form.querySelector('input[type="search"]');
+        const panel = form.querySelector(".lm-search-panel");
+
+        return input && panel ? { input, panel } : null;
+    };
+
+    const hidePanel = (form) => {
+        const parts = getFormParts(form);
+
+        if (!parts) {
+            return;
+        }
+
+        parts.panel.hidden = true;
+        parts.panel.innerHTML = "";
+        setExpanded(parts.input, false);
+    };
+
+    const showMessage = (form, message, hint = "") => {
+        const parts = getFormParts(form);
+
+        if (!parts) {
+            return;
+        }
+
+        parts.panel.innerHTML = `
+            <div class="lm-search-panel__state" role="status">
+                <strong>${escapeHTML(message)}</strong>
+                ${hint ? `<span>${escapeHTML(hint)}</span>` : ""}
+            </div>
+        `;
+        parts.panel.hidden = false;
+        setExpanded(parts.input, true);
+    };
+
+    const resultTemplate = (item) => `
+        <a class="lm-search-result" href="${escapeHTML(item.url)}">
+            <span class="lm-search-result__image">
+                <img src="${escapeHTML(item.image)}" alt="${escapeHTML(item.imageAlt || item.title)}" loading="lazy" />
+            </span>
+            <span class="lm-search-result__body">
+                ${item.category ? `<span class="lm-search-result__category">${escapeHTML(item.category)}</span>` : ""}
+                <span class="lm-search-result__title">${escapeHTML(item.title)}</span>
+                ${item.excerpt ? `<span class="lm-search-result__excerpt">${escapeHTML(item.excerpt)}</span>` : ""}
+                ${item.priceHtml ? `<span class="lm-search-result__price">${item.priceHtml}</span>` : ""}
+            </span>
+        </a>
+    `;
+
+    const renderResults = (form, data) => {
+        const parts = getFormParts(form);
+        const items = Array.isArray(data.items) ? data.items : [];
+
+        if (!parts) {
+            return;
+        }
+
+        if (items.length === 0) {
+            showMessage(form, strings.empty, strings.hint);
+            return;
+        }
+
+        parts.panel.innerHTML = `
+            <div class="lm-search-panel__label">${escapeHTML(strings.ready)}</div>
+            <div class="lm-search-panel__list">
+                ${items.map(resultTemplate).join("")}
+            </div>
+            <a class="lm-search-panel__all" href="${escapeHTML(data.searchUrl || form.action)}">${escapeHTML(strings.allResults)}</a>
+        `;
+        parts.panel.hidden = false;
+        setExpanded(parts.input, true);
+    };
+
+    const searchProducts = (form) => {
+        const parts = getFormParts(form);
+
+        if (!parts) {
+            return;
+        }
+
+        const query = parts.input.value.trim();
+        const currentState = state.get(form) || {};
+
+        window.clearTimeout(currentState.timer);
+
+        if (currentState.controller) {
+            currentState.controller.abort();
+        }
+
+        if (query.length < minChars) {
+            hidePanel(form);
+            state.set(form, { ...currentState, controller: null, timer: 0, query });
+            return;
+        }
+
+        const timer = window.setTimeout(async () => {
+            const controller = new AbortController();
+            state.set(form, { ...currentState, controller, timer: 0, query });
+            showMessage(form, strings.loading);
+
+            try {
+                const url = new URL(endpoint);
+                url.searchParams.set("search", query);
+                url.searchParams.set("limit", String(limit));
+
+                const response = await fetch(url.toString(), {
+                    headers: { Accept: "application/json" },
+                    signal: controller.signal,
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Search request failed: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (parts.input.value.trim() !== query) {
+                    return;
+                }
+
+                renderResults(form, data);
+            } catch (error) {
+                if (error.name === "AbortError") {
+                    return;
+                }
+
+                showMessage(form, strings.error, strings.hint);
+            }
+        }, 220);
+
+        state.set(form, { ...currentState, timer, query });
+    };
+
+    const focusResult = (panel, direction) => {
+        const links = [...panel.querySelectorAll("a")];
+
+        if (links.length === 0) {
+            return;
+        }
+
+        const currentIndex = links.indexOf(document.activeElement);
+        const nextIndex = currentIndex < 0
+            ? 0
+            : (currentIndex + direction + links.length) % links.length;
+
+        links[nextIndex].focus();
+    };
+
+    forms.forEach((form, index) => {
+        const parts = enhanceForm(form, index);
+
+        if (!parts) {
+            return;
+        }
+
+        parts.input.addEventListener("input", () => searchProducts(form));
+
+        parts.input.addEventListener("focus", () => {
+            if (parts.input.value.trim().length >= minChars && parts.panel.innerHTML.trim() !== "") {
+                parts.panel.hidden = false;
+                setExpanded(parts.input, true);
+            }
+        });
+
+        parts.input.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") {
+                hidePanel(form);
+                return;
+            }
+
+            if (event.key === "ArrowDown" && !parts.panel.hidden) {
+                event.preventDefault();
+                focusResult(parts.panel, 1);
+            }
+        });
+
+        parts.panel.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") {
+                event.preventDefault();
+                hidePanel(form);
+                parts.input.focus();
+                return;
+            }
+
+            if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+                event.preventDefault();
+                focusResult(parts.panel, event.key === "ArrowDown" ? 1 : -1);
+            }
+        });
+    });
+
+    updateHeaderOffset();
+    window.addEventListener("resize", updateHeaderOffset);
+    window.addEventListener("load", updateHeaderOffset);
+
+    document.addEventListener("click", (event) => {
+        forms.forEach((form) => {
+            if (event.target instanceof Node && form.contains(event.target)) {
+                return;
+            }
+
+            hidePanel(form);
+        });
+    });
+})();
+
+(function () {
     const sticky = document.querySelector("[data-lm-sticky-atc]");
 
     if (!sticky) {

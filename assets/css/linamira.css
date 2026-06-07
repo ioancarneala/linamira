@@ -670,6 +670,138 @@ body.has-modal-open .lm-desktop-nav .wp-block-navigation__responsive-container-o
     transform: rotate(45deg);
 }
 
+.lm-desktop-nav .lm-mobile-menu-search,
+.lm-desktop-nav .lm-mobile-menu-feature,
+.lm-desktop-nav .lm-mobile-menu-utility {
+    display: none;
+}
+
+.lm-desktop-nav .wp-block-navigation__responsive-container.is-menu-open .lm-mobile-menu-search {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    width: 100%;
+    min-height: 46px;
+    margin: 0 0 var(--wp--preset--spacing--sm);
+    border: 1px solid var(--wp--preset--color--soft-border);
+    border-radius: 2px;
+    background: var(--wp--preset--color--white-warm);
+}
+
+.lm-desktop-nav .wp-block-navigation__responsive-container.is-menu-open .lm-mobile-menu-search .wp-block-search__inside-wrapper {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 46px;
+    padding: 0;
+    border: 0;
+}
+
+.lm-desktop-nav .wp-block-navigation__responsive-container.is-menu-open .lm-mobile-menu-search input[type="search"] {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+    height: 46px;
+    padding: 0 0 0 0.9rem;
+    border: 0;
+    background: transparent;
+    color: var(--wp--preset--color--soft-black);
+    outline: 0;
+    box-shadow: none;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.lm-desktop-nav .wp-block-navigation__responsive-container.is-menu-open .lm-mobile-menu-search .wp-block-search__button {
+    display: inline-grid;
+    place-items: center;
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--wp--preset--color--soft-black);
+}
+
+.lm-desktop-nav .wp-block-navigation__responsive-container.is-menu-open .lm-mobile-menu-search .wp-block-search__button svg {
+    width: 22px;
+    height: 22px;
+    fill: currentColor;
+}
+
+.lm-mobile-menu-search input[type="search"]::-webkit-search-cancel-button,
+.lm-mobile-menu-search input[type="search"]::-webkit-search-decoration {
+    display: none;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.lm-mobile-menu-search input[type="search"]::placeholder {
+    color: var(--wp--preset--color--cocoa);
+    opacity: 0.8;
+}
+
+.lm-mobile-menu-search:focus-within {
+    border-color: var(--wp--preset--color--warm-gold);
+}
+
+.lm-desktop-nav .wp-block-navigation__responsive-container.is-menu-open .lm-mobile-menu-feature,
+.lm-desktop-nav .wp-block-navigation__responsive-container.is-menu-open .lm-mobile-menu-utility {
+    display: flex;
+}
+
+.lm-desktop-nav .wp-block-navigation__responsive-container.is-menu-open .lm-mobile-menu-feature .wp-block-navigation-item__content {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: var(--wp--preset--spacing--sm);
+    min-height: 0;
+    margin-inline: -1rem;
+    margin-block-start: var(--wp--preset--spacing--md);
+    padding: var(--wp--preset--spacing--md) 1rem;
+    border-block-end: 0;
+    background: var(--wp--preset--color--warm-cream);
+}
+
+.lm-desktop-nav .wp-block-navigation__responsive-container.is-menu-open .lm-mobile-menu-feature .wp-block-navigation-item__label::after {
+    content: "Arome calde pentru seri liniștite acasă";
+    display: block;
+    max-width: 17rem;
+    margin-block-start: 0.35rem;
+    color: var(--wp--preset--color--cocoa);
+    font-family: var(--wp--preset--font-family--inter);
+    font-size: var(--wp--preset--font-size--small);
+    line-height: 1.35;
+}
+
+.lm-desktop-nav .wp-block-navigation__responsive-container.is-menu-open .lm-mobile-menu-feature .wp-block-navigation-item__content::after {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+}
+
+.lm-desktop-nav .wp-block-navigation__responsive-container.is-menu-open .lm-mobile-menu-utility .wp-block-navigation-item__content {
+    min-height: 3.15rem;
+    justify-content: flex-start;
+    border-block-end: 0;
+    color: var(--wp--preset--color--cocoa);
+    font-family: var(--wp--preset--font-family--inter);
+    font-size: var(--wp--preset--font-size--body);
+    line-height: 1.3;
+}
+
+.lm-desktop-nav .wp-block-navigation__responsive-container.is-menu-open .lm-mobile-menu-feature + .lm-mobile-menu-utility .wp-block-navigation-item__content {
+    margin-block-start: var(--wp--preset--spacing--md);
+    border-block-start: 1px solid var(--wp--preset--color--soft-border);
+}
+
+.lm-desktop-nav .wp-block-navigation__responsive-container.is-menu-open .lm-mobile-menu-utility .wp-block-navigation-item__content::after {
+    content: none;
+}
+
 .lm-desktop-nav a,
 .lm-header-actions a {
     color: var(--wp--preset--color--soft-black);
@@ -735,6 +867,9 @@ body.has-modal-open .lm-desktop-nav .wp-block-navigation__responsive-container-o
     color: var(--wp--preset--color--soft-black);
     font-size: var(--wp--preset--font-size--small);
     outline: 0;
+    box-shadow: none;
+    -webkit-appearance: none;
+    appearance: none;
 }
 
 .lm-header-search .wp-block-search__button {
@@ -771,6 +906,153 @@ body.has-modal-open .lm-desktop-nav .wp-block-navigation__responsive-container-o
 
 .lm-header-search:focus-within {
     border-color: var(--wp--preset--color--warm-gold);
+}
+
+.lm-header-search .lm-search-panel,
+.lm-mobile-menu-search .lm-search-panel {
+    position: absolute;
+    inset-block-start: calc(100% + 0.5rem);
+    inset-inline-end: 0;
+    z-index: 320;
+    width: min(88vw, 26rem);
+    border: 1px solid var(--wp--preset--color--soft-border);
+    background: var(--wp--preset--color--white-warm);
+    box-shadow: 0 18px 42px color-mix(in srgb, var(--wp--preset--color--soft-black) 14%, transparent);
+}
+
+.lm-mobile-menu-search .lm-search-panel {
+    position: static;
+    flex: 0 0 100%;
+    width: 100%;
+    margin-block-start: 0.5rem;
+    box-shadow: none;
+}
+
+.lm-search-panel[hidden] {
+    display: none;
+}
+
+.lm-search-panel__state {
+    display: grid;
+    gap: 0.25rem;
+    padding: var(--wp--preset--spacing--md);
+    color: var(--wp--preset--color--cocoa);
+    font-size: var(--wp--preset--font-size--small);
+    line-height: 1.45;
+}
+
+.lm-search-panel__state strong {
+    color: var(--wp--preset--color--soft-black);
+    font-weight: 600;
+}
+
+.lm-search-panel__label {
+    padding: 0.75rem var(--wp--preset--spacing--md);
+    border-block-end: 1px solid var(--wp--preset--color--soft-border);
+    color: var(--wp--preset--color--cocoa);
+    font-size: var(--wp--preset--font-size--small);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
+.lm-search-panel__list {
+    display: grid;
+}
+
+.lm-search-result {
+    display: grid;
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+    gap: var(--wp--preset--spacing--sm);
+    padding: var(--wp--preset--spacing--sm) var(--wp--preset--spacing--md);
+    border-block-end: 1px solid var(--wp--preset--color--soft-border);
+    color: var(--wp--preset--color--soft-black);
+    text-decoration: none;
+}
+
+.lm-search-result:hover,
+.lm-search-result:focus-visible {
+    background: var(--wp--preset--color--warm-cream);
+    color: var(--wp--preset--color--soft-black);
+}
+
+.lm-search-result__image {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1 / 1;
+    border: 1px solid var(--wp--preset--color--soft-border);
+    background: var(--wp--preset--color--white-warm);
+    overflow: hidden;
+}
+
+.lm-search-result__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.lm-search-result__body {
+    display: grid;
+    align-content: center;
+    min-width: 0;
+}
+
+.lm-search-result__category,
+.lm-search-result__excerpt {
+    color: var(--wp--preset--color--cocoa);
+    font-size: 0.8125rem;
+    line-height: 1.35;
+}
+
+.lm-search-result__category {
+    margin-block-end: 0.2rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.lm-search-result__title {
+    color: var(--wp--preset--color--soft-black);
+    font-family: var(--wp--preset--font-family--luxury-serif);
+    font-size: 1.18rem;
+    line-height: 1.08;
+}
+
+.lm-search-result__excerpt {
+    display: -webkit-box;
+    margin-block-start: 0.25rem;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.lm-search-result__price {
+    margin-block-start: 0.35rem;
+    color: var(--wp--preset--color--soft-black);
+    font-size: var(--wp--preset--font-size--small);
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.lm-search-panel__all {
+    display: flex;
+    justify-content: center;
+    padding: 0.85rem var(--wp--preset--spacing--md);
+    background: var(--wp--preset--color--warm-cream);
+    color: var(--wp--preset--color--soft-black);
+    font-size: var(--wp--preset--font-size--small);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    line-height: 1.2;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+
+.lm-search-panel__all:hover {
+    background: var(--wp--preset--color--soft-black);
+    color: var(--wp--preset--color--warm-cream);
 }
 
 .lm-header-account {
@@ -1094,6 +1376,26 @@ body.has-modal-open .lm-desktop-nav .wp-block-navigation__responsive-container-o
         display: flex;
     }
 
+    .lm-header-search .lm-search-panel {
+        position: fixed;
+        inset-block-start: calc(var(--lm-header-offset, 7rem) + 0.5rem);
+        inset-inline: max(1rem, calc((100vw - var(--wp--style--global--wide-size)) / 2));
+        width: auto;
+        max-height: min(34rem, calc(100dvh - var(--lm-header-offset, 7rem) - 2rem));
+        overflow-y: auto;
+    }
+
+    .lm-header-search .lm-search-panel__list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .lm-header-search .lm-search-result {
+        border-inline-end: 1px solid var(--wp--preset--color--soft-border);
+    }
+
+    .lm-header-search .lm-search-result:nth-child(2n) {
+        border-inline-end: 0;
+    }
 }
 
 @media (min-width: 1120px) {
@@ -1171,6 +1473,18 @@ body.has-modal-open .lm-desktop-nav .wp-block-navigation__responsive-container-o
 
     .lm-header-search {
         width: clamp(12rem, 16vw, 17rem);
+    }
+
+    .lm-header-search .lm-search-panel__list {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .lm-header-search .lm-search-result:nth-child(2n) {
+        border-inline-end: 1px solid var(--wp--preset--color--soft-border);
+    }
+
+    .lm-header-search .lm-search-result:nth-child(3n) {
+        border-inline-end: 0;
     }
 
 }
